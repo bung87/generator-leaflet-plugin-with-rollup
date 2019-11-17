@@ -1,0 +1,30 @@
+{
+  "main": "dist/<%= name %>.cjs.js",
+  "module": "dist/<%= name %>.esm.js",
+  "browser": "dist/<%= name %>.umd.js",
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "rollup": "^0.66.6",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-postcss": "^1.6.2",
+    "gh-pages": "^2.1.1"
+  },
+  "scripts": {
+    "build": "yarn dist",
+    "build-examples":"parcel build -d build/examples examples/index.html",
+    "deploy-examples": "node tools/gh-pages-publish.js",
+    "dev": "rollup -c -w | parcel examples/index.html",
+    "dist": "rollup -c"
+  },
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
+  "peer-dependencies": {
+    "leaflet": "^1.5.0"
+  }
+}

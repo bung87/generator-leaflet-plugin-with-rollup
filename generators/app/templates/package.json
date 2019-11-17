@@ -16,7 +16,7 @@
     "parcel": "^1.12.4"
   },
   "scripts": {
-    "build": "yarn dist",
+    "build": "<%= packageManager %> dist",
     "build-examples":"parcel build -d build/examples examples/index.html",
     "deploy-examples": "node tools/gh-pages-publish.js",
     "dev": "rollup -c -w | parcel examples/index.html",

@@ -118,7 +118,7 @@ module.exports = class extends Generator {
   default() {
     
     this._writePackageJson()
-    // const readmeTpl = _.template(this.fs.read(this.templatePath('README.md')));
+    const readmeTpl = _.template(this.fs.read(this.templatePath('README.md')));
     // https://github.com/yeoman/generator-node/blob/master/generators/app/index.js
     this.composeWith(require.resolve('generator-node/generators/app'), {
       // generateInto:this.destinationRoot(),
@@ -128,11 +128,13 @@ module.exports = class extends Generator {
       git: false,
       travis:true,
       skipInstall: true,
-      skipMessage: true
-      // readme: readmeTpl({
-      //   generatorName: this.props.name,
-      //   yoName: this.props.name.replace('generator-', '')
-      // })
+      skipMessage: true,
+      readme: readmeTpl({
+        name: this.props.name,
+        description: this.props.description,
+        mainClass:this.props.mainClass,
+        license:this.props.license
+      })
     });
   }
   _writePackageJson() {

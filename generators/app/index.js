@@ -30,6 +30,7 @@ module.exports = class extends Generator {
     this.props = {};
   }
   packageName() {
+    
     return askName(
       {
         name: 'name',
@@ -43,16 +44,25 @@ module.exports = class extends Generator {
       this
     ).then(props => {
       Object.assign(this.props, props);
+      if (path.basename(this.destinationPath()) !== this.props.name) {
+        this.log(
+          `Your plugin must be inside a folder named ${
+          this.props.name
+          }\nI'll automatically create this folder.`
+        );
+        mkdirp(this.props.name);
+        this.destinationRoot(this.destinationPath(this.props.name));
+      }
     });
   }
-  mainClass(){
+  mainClass() {
     return this.prompt(
       {
         name: 'mainClass',
         message: 'Your leaflet plugin main class',
-        default: _.capitalize(this.props.name.replace("leaflet","").replace(/\W/,"")),
+        default: _.capitalize(this.props.name.replace("leaflet", "").replace(/\W/, "")),
         transformer: str => {
-          return _.capitalize(str).replace(/\W/,"")
+          return _.capitalize(str).replace(/\W/, "")
         }
       },
       this
@@ -65,7 +75,7 @@ module.exports = class extends Generator {
       //base type
       new inquirer.Separator(),
       "Icon", "DivIcon"
-      ],
+    ],
       [ //base class
         new inquirer.Separator(),
         "Layer", "Control", "Handler", "Projection", "CRS", "Renderer"
@@ -98,30 +108,27 @@ module.exports = class extends Generator {
       name: "packageManager",
       message: 'Your favorite package manager',
       choices: ["yarn", "npm"],//, "pnpm"],
+      store:true,
       default: true
     }).then(props => {
       Object.assign(this.props, props);
     })
   }
- 
-  default() {
-    if (path.basename(this.destinationPath()) !== this.props.name) {
-      this.log(
-        `Your plugin must be inside a folder named ${
-        this.props.name
-        }\nI'll automatically create this folder.`
-      );
-      mkdirp(this.props.name);
-      this.destinationRoot(this.destinationPath(this.props.name));
-    }
 
+  default() {
+    
+    this._writePackageJson()
     // const readmeTpl = _.template(this.fs.read(this.templatePath('README.md')));
     // https://github.com/yeoman/generator-node/blob/master/generators/app/index.js
-    this.composeWith(require.resolve('./base.js'), {
+    this.composeWith(require.resolve('generator-node/generators/app'), {
+      // generateInto:this.destinationRoot(),
       boilerplate: false,
       name: this.props.name,
       coveralls: false,
-      git:false
+      git: false,
+      travis:true,
+      skipInstall: true,
+      skipMessage: true
       // readme: readmeTpl({
       //   generatorName: this.props.name,
       //   yoName: this.props.name.replace('generator-', '')
@@ -140,14 +147,49 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    this._writePackageJson()
+    
     const rollupTpl = _.template(this.fs.read(this.templatePath('rollup.config.js')));
-    this.fs.write(this.destinationPath('rollup.config.js'),rollupTpl(this.props))
+    this.fs.write(this.destinationPath('rollup.config.js'), rollupTpl(this.props))
+    const testTpl = _.template(this.fs.read(this.templatePath(["spec", "test.test.js"].join(path.sep))));
+    this.fs.write(this.destinationPath(["spec", `${this.props.mainClass.toLowerCase()}.test.js`].join(path.sep)), testTpl(this.props))
+    const otherFiles = [
+      ["src", "index.js"],
+      ["src", "bundle.js"],
+      ["src", "style.scss"],
+      ["examples", "index.html"],
+      ["examples", "index.js"],
+      ["tools", "gh-pages-publish.js"],
+      [".gitignore"]
+    ]
+    otherFiles.forEach(paths => {
+      const tpl = _.template(this.fs.read(this.templatePath(paths.join(path.sep))));
+      this.fs.write(this.destinationPath(paths.join(path.sep)), tpl(this.props))
+    })
   }
 
   install() {
-    var pm = { bower: false,npm:false,yarn:false }
-    pm[this.props.packageManager] = true
-    this.installDependencies(pm);
+    // var pm = { bower: false,npm:false,yarn:false }
+    // pm[this.props.packageManager] = true
+    // this.installDependencies(pm);
+    const pkg = this.fs.readJSON(this.templatePath('package.json'));
+    const peerDependenciesMap = new Map()
+    for (let k in pkg["peer-dependencies"]){
+      peerDependenciesMap.set(k, pkg["peer-dependencies"][k]) 
+    }
+    const peerDependencies = []
+    peerDependenciesMap.forEach( (v,k) => {
+      peerDependencies.push(`${k}@${v}`)
+    })
+    
+    if (this.props.packageManager === "yarn") {
+      // this.yarnInstall(peerDependencies,{ 'save': false },{cwd:this.destinationRoot()})
+      this.yarnInstall(null,{silent:true},{cwd:this.destinationRoot()})
+    } else if (this.props.packageManager === "npm") {
+
+      this.npmInstall(peerDependencies,{ 'save': false },{cwd:this.destinationRoot()})
+      this.npmInstall(null,null,{cwd:this.destinationRoot()})
+    }
+
   }
+  
 };

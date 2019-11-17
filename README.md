@@ -29,7 +29,7 @@ provided by this project
 - [Parcel](https://parceljs.org/) develop and distribute examples
 - [Rollup](https://rollupjs.org) distribute your plugin as umd,cjs,ejs module  
    with babel,node-sass,postcss,postcss-sprites supported
-- [gh-pages] release your plugin examples pages to ghpages
+- [gh-pages](https://github.com/tschaub/gh-pages) release your plugin examples pages to ghpages
 
 ### Running tests
 
@@ -59,7 +59,7 @@ generator-leaflet-plugin-with-rollup was inspired by [generator-node](https://gi
 
 ## License
 
-MIT © [bung](www.bungos.me)
+MIT © [bung](http://www.bungos.me)
 
 
 [npm-image]: https://badge.fury.io/js/generator-leaflet-plugin-with-rollup.svg

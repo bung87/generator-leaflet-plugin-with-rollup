@@ -30,7 +30,7 @@ module.exports = class extends Generator {
     this.props = {};
   }
   packageName() {
-    
+
     return askName(
       {
         name: 'name',
@@ -108,7 +108,7 @@ module.exports = class extends Generator {
       name: "packageManager",
       message: 'Your favorite package manager',
       choices: ["yarn", "npm"],//, "pnpm"],
-      store:true,
+      store: true,
       default: true
     }).then(props => {
       Object.assign(this.props, props);
@@ -116,7 +116,7 @@ module.exports = class extends Generator {
   }
 
   default() {
-    
+
     this._writePackageJson()
     const readmeTpl = _.template(this.fs.read(this.templatePath('README.md')));
     // https://github.com/yeoman/generator-node/blob/master/generators/app/index.js
@@ -126,14 +126,14 @@ module.exports = class extends Generator {
       name: this.props.name,
       coveralls: false,
       git: false,
-      travis:true,
+      travis: true,
       skipInstall: true,
       skipMessage: true,
       readme: readmeTpl({
         name: this.props.name,
         description: this.props.description,
-        mainClass:this.props.mainClass,
-        license:this.props.license
+        mainClass: this.props.mainClass,
+        license: this.props.license
       })
     });
   }
@@ -141,15 +141,15 @@ module.exports = class extends Generator {
     const pkg = this.fs.readJSON(this.destinationPath('package.json'), {});
     const pkgTpl = _.template(this.fs.read(this.templatePath('package.json')));
     const base = JSON.parse(pkgTpl(this.props))
-    extend(pkg, base);
+    extend(pkg, _.omit(base, ["devDependencies", "peer-dependencies", "dependencies"]));
     pkg.keywords = pkg.keywords || [];
-    pkg.keywords.push('yeoman-generator')
+    pkg.keywords.push('leaflet-plugin')
     pkg.keywords = _.uniq(pkg.keywords);
     this.fs.writeJSON(this.destinationPath('package.json'), pkg);
   }
 
   writing() {
-    
+
     const rollupTpl = _.template(this.fs.read(this.templatePath('rollup.config.js')));
     this.fs.write(this.destinationPath('rollup.config.js'), rollupTpl(this.props))
     const testTpl = _.template(this.fs.read(this.templatePath(["spec", "test.test.js"].join(path.sep))));
@@ -174,24 +174,26 @@ module.exports = class extends Generator {
     // pm[this.props.packageManager] = true
     // this.installDependencies(pm);
     const pkg = this.fs.readJSON(this.templatePath('package.json'));
-    const peerDependenciesMap = new Map()
-    for (let k in pkg["peer-dependencies"]){
-      peerDependenciesMap.set(k, pkg["peer-dependencies"][k]) 
-    }
-    const peerDependencies = []
-    peerDependenciesMap.forEach( (v,k) => {
-      peerDependencies.push(`${k}@${v}`)
-    })
-    
+    // const peerDependenciesMap = new Map()
+    // for (let k in pkg["peer-dependencies"]){
+    //   peerDependenciesMap.set(k, pkg["peer-dependencies"][k]) 
+    // }
+    // const peerDependencies = []
+    // peerDependenciesMap.forEach( (v,k) => {
+    //   peerDependencies.push(`${k}@${v}`)
+    // })
+    const peerDependencies = Object.keys(pkg["peer-dependencies"])
+    const devDependencies = Object.keys(pkg["devDependencies"]).concat("https://github.com/bung87/postcss-sprites/archive/v4.2.1b.tar.gz")
     if (this.props.packageManager === "yarn") {
       // this.yarnInstall(peerDependencies,{ 'save': false },{cwd:this.destinationRoot()})
-      this.yarnInstall(null,{silent:true},{cwd:this.destinationRoot()})
+      this.yarnInstall(peerDependencies, { silent: true, "save-peer": true, prod: true }, { cwd: this.destinationRoot() })
+      this.yarnInstall(devDependencies, { silent: false, "save-dev": true, dev: true }, { cwd: this.destinationRoot() })
     } else if (this.props.packageManager === "npm") {
 
-      this.npmInstall(peerDependencies,{ 'save': false },{cwd:this.destinationRoot()})
-      this.npmInstall(null,null,{cwd:this.destinationRoot()})
+      this.npmInstall(peerDependencies, { 'save-peer': true, prod: true }, { cwd: this.destinationRoot() })
+      this.npmInstall(devDependencies, { 'save-dev': true, dev: true }, { cwd: this.destinationRoot() })
     }
 
   }
-  
+
 };

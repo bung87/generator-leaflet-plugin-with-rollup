@@ -10,9 +10,9 @@
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-postcss": "^1.6.2",
+    "@rollup/plugin-json": "^4.0.0",
     "gh-pages": "^2.1.1",
-    "node-sass": "^4.13.0",
-    "postcss-sprites": "^4.2.1",
+    "sass": "^1.23.3",
     "parcel": "^1.12.4"
   },
   "scripts": {

@@ -4,7 +4,7 @@ import pkg from './package.json';
 import postcss from 'rollup-plugin-postcss'
 import sprites from 'postcss-sprites';
 import babel from 'rollup-plugin-babel';
-
+import json from '@rollup/plugin-json'
 export default [
 
 	// browser-friendly UMD build
@@ -20,6 +20,7 @@ export default [
 		},
 		external: ['leaflet'],
 		plugins: [
+			json(),
 			postcss({
 				extract: "dist/style.css",
 				plugins: [sprites({
@@ -44,6 +45,7 @@ export default [
 		input: 'src/index.js',
 		external: ['leaflet'],
 		plugins: [
+			json(),
 			postcss({
 
 			}),
@@ -72,6 +74,7 @@ export default [
 		input: 'src/index.js',
 		external: ['leaflet'],
 		plugins: [
+			json(),
 			postcss({
 
 			}),

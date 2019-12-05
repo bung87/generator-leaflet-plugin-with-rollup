@@ -1,8 +1,8 @@
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
-import postcss from 'rollup-plugin-postcss'
-import sprites from 'postcss-sprites';
+import postcss from '@bung87/rollup-plugin-postcss'
+import sprites from '@bung87/postcss-sprites';
 import babel from 'rollup-plugin-babel';
 import json from '@rollup/plugin-json'
 export default [

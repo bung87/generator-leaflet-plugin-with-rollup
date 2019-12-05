@@ -183,7 +183,7 @@ module.exports = class extends Generator {
     //   peerDependencies.push(`${k}@${v}`)
     // })
     const peerDependencies = Object.keys(pkg["peer-dependencies"])
-    const devDependencies = Object.keys(pkg["devDependencies"]).concat("https://github.com/bung87/postcss-sprites/archive/v4.2.1b.tar.gz")
+    const devDependencies = Object.keys(pkg["devDependencies"])
     if (this.props.packageManager === "yarn") {
       // this.yarnInstall(peerDependencies,{ 'save': false },{cwd:this.destinationRoot()})
       this.yarnInstall(peerDependencies, { silent: true, "save-peer": true, prod: true }, { cwd: this.destinationRoot() })
